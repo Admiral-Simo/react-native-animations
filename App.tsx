@@ -1,52 +1,46 @@
-import {StyleSheet, Text, StatusBar,useColorScheme} from 'react-native';
-import React, { useMemo } from 'react';
-import {NavigationContainer, DefaultTheme,DarkTheme} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import HomeScreen from './pages/IntroScreen01';
-import IntroScreen01 from './pages/IntroScreen01';
-import IntroScreen02 from './pages/IntroScreen02';
-import LoginScreen from './pages/LoginScreen';
+import {StatusBar, useColorScheme} from 'react-native';
+import React, {useMemo} from 'react';
+import {DefaultTheme, DarkTheme} from '@react-navigation/native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import store from './redux/store';
+import {Provider} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
+import {persistStore} from 'redux-persist';
+import MainNavigator from './navigators/MainNavigator';
 
-const Stack = createNativeStackNavigator();
+let persistor = persistStore(store);
 
 const App = () => {
   const colorScheme = useColorScheme();
   const theme = useMemo(
     () =>
-      !(colorScheme === "dark")
+      colorScheme === 'dark'
         ? {
             ...DarkTheme,
             colors: {
               ...DarkTheme.colors,
-              primary: "#fff",
+              primary: '#fff',
             },
           }
         : {
             ...DefaultTheme,
             colors: {
               ...DefaultTheme.colors,
-              primary: "#000",
+              primary: '#000',
             },
           },
-    [colorScheme]
+    [colorScheme],
   );
   return (
-    <SafeAreaProvider className="flex-1">
-      <NavigationContainer theme={theme}>
-        <Stack.Navigator
-          initialRouteName="IntroScreen01"
-          screenOptions={{headerShown: false, animation: 'fade'}}>
-          <Stack.Screen name="IntroScreen01" component={IntroScreen01} />
-          <Stack.Screen name="IntroScreen02" component={IntroScreen02} />
-          <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-      <StatusBar backgroundColor="black" barStyle="light-content" />
-    </SafeAreaProvider>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <SafeAreaProvider className="flex-1">
+          <MainNavigator theme={theme} />
+          <StatusBar backgroundColor="white" barStyle="dark-content" />
+        </SafeAreaProvider>
+      </PersistGate>
+    </Provider>
   );
 };
 
 export default App;
-
-const styles = StyleSheet.create({});
